@@ -1,0 +1,10 @@
+---------------判空方法---------------------
+1）boolean StringUtils.isBlank(String str)
+2）boolean StringUtils.isEmpty(String str)         
+3）boolean StringUtils.isNotBlank(String str)
+4）boolean StringUtils.isNotEmpty(String str)
+5）boolean StringUtils.isAnyBlank(CharSequence… css)
+6）boolean StringUtils.isAnyEmpty(CharSequence… css)
+7）boolean StringUtils.isNoneBlank(CharSequence… css)
+8）boolean StringUtils.isNoneEmpty(CharSequence… css)
+9）boolean StringUtils.isWhitespace(CharSequence cs)
