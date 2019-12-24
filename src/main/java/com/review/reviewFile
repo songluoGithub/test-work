@@ -33,32 +33,106 @@ Collection类中其实是包含list,set,queue三个集合
 byte、short、int 或者 char。从 Java SE 7 开始，switch 支持字符串 String 类型了
 
 17、ArrayList和Vector区别，HashMap和Hashtable区别（了解这几个类的底层jdk中的编码方式）。
+先答表面区别
+    一.同步性:Vector是线程安全的，也就是说是同步的，而ArrayList是线程序不安全的，不是同步的
+    二.数据增长:当需要增长时,Vector默认增长为原来一培，而ArrayList却是原来的一半
 
+    一.历史原因:Hashtable是基于陈旧的Dictionary类的，HashMap是Java 1.2引进的Map接口的一个实现
+    二.同步性:HashTable是线程安全的，也就是说是同步的，而HashMap是线程序不安全的，不是同步的
+    三.值：只有HashMap可以让你将空值作为一个表的条目的key或value，HashTable不允许关键字或值为null
+
+再次回答底层区别
+从编码的角度描述
 
 18、GC是什么，为什么要有GC，简单介绍GC。
 
+
 20、介绍Java中的Collection framework。
 21、Collection框架中实现比较方法
+Comparable  自比比较器
+Comparator  当自比比较器无法使用时才使用外部比较器
+都需要自己定义，请重点关注
+
 22、String和Stringbuffer的区别
+参考  https://baijiahao.baidu.com/s?id=1605691070613344469&wfr=spider&for=pc
+
+三者都是用来对字符串进行操作，String通常用来定义一个变量，而StringBuilder StringBuffer则通常用来对字符串进行拼接等操作。
+但其实String同样的可以用来拼接字符串，可我们为什么很少使用呢，这样从三者的底层代码说起。
+String的底层代码为一个用final修饰的char数组，这意味着定义一个String变量以后，该变量的内容是不可变的。
+所以String拼接时会创建多个对象，而这些对象暂时不会失去引用，jvm无法回收造成资源浪费
+StringBuilder 与StringBuffer都继承自AbstractStringBuilder，该类的char数组并没有用final修饰，内容是可变的。
+通过底层代码我们可以看到StringBuilder 与StringBuffer在拼接字符串时，通过判断字符串长度是否足够，不够就创建一个新的数组用
+来封装数据，而原来的对象被放弃引用，等待垃圾回收，从而减少内存的浪费，并且StringBuilder效率高非线程安全
+
 23、final、finally、finalize区别
-24、面向对象的特征
-25、String是最基本的数据类型吗。
-26、运行时异常和一般异常的区别
+当垃圾回收器将要回收对象所占内存之前被调用，即当一个对象被虚拟机宣告死亡时会先调用它finalize()方法，让此对象处理它生前的最后事情（这个对象可以趁这个时机挣脱死亡的命运）
+自我救赎的方法是：
+覆写对象的finalize方法，并且在方法中重新引用即可
+
+finalize()的调用具有不确定性，只会调用一次，而且只保证方法会调用，但不保证方法里的任务会被执行完（比如一个对象手脚不够利索，磨磨叽叽，还在自救的过程中，被杀死回收了）。
+
+
 27、说出ArrayList、Vector、Linkedlist的存储性能和特性
+ArrayList和Vector(向量)都是使用数组方式存储数据，此数组元素数大于实际存储的数据以便增加和插入元素，它们都允许直接按序号索引元素，但是插入元素要涉及数组元素移动等内存操作，所以索引数据快而插入数据效率较低，
+Vector由于使用了synchronized（同步）方法（线程安全），通常性能上较ArrayList差。
+LinkedList使用双向链表实现存储，按序号索引数据需要进行前向或后向遍历，但是插入数据时只需要记录本项的前后项即可，所以插入速度较快。
+LinkedList也是线程不安全的，LinkedList提供了一些方法，使得LinkedList可以被当作堆栈和队列来使用。
+
 28、heap和stack区别
+一、存储角度stack栈存储的是变量和引用，heap堆存储的是对象和jre classes
+二、访问速度stack栈的速度大于堆的访问速度
+三、垃圾回收主要是在栈中操作，堆中极少
+四、从线程的角度，一个线程有自己的java栈，每个栈共享一个堆
+
 29、Java中的异常处理机制的简单原理和应用
 30、垃圾回收的原理和特点，并考虑2种回收机制
 31、说出一些常用的 集合类和方法
 32、描述一下JVM加载Class文件的原理和机制
 33、排序的几种方法，了解。（算法和数据结构在面试的时候还没有被问到）
 34、Java语言如何进行异常处理，throws，throw，try catch finally代表什么意义，try块中可以抛出异常吗
-35、一个’.java’源文件是否可以包括多个类，有什么限制。
+
 36、Java中有几种类型流，jdk为每种类型的流提供了一些抽象类以供继承，请分别说出它们是哪些类。
 37、Java中会存在内存泄漏吗，请简单描述。
+理论上Java因为有垃圾回收机制（GC）不会存在内存泄露问题（这也是Java被广泛使用于服务器端编程的一个重要原因）；然而在实际开发中，可能会存在无用但可达的对象，这些对象不能
+被GC回收，因此也会导致内存泄露的发生。例如Hibernate的Session（一级缓存）中的对象属于持久态，垃圾回收器是不会回收这些对象的，然而这些对象中可能存在无用的垃圾对象，如果
+不及时关闭（close）或清空（flush）一级缓存就可能导致内存泄露。下面例子中的代码也会导致内存泄露。
+
 38、静态变量和实例变量的区别。
+在语法定义上的区别：静态变量前要加 static 关键字，而实例变量前则不加。
+在程序运行时的区别：静态变量则可以直接使用类名来引用。静态变量不属于某个实例对象，而是属于类，所以也称为类变量，只要程序加载了类的字节码，不用创建任何实例对象，静态变量
+就会被分配空间，静态变量就可以被使用了。且一个类不管创建多少个对象，静态变量在内存中有且仅有一个拷贝。在 Java 开发中，上下文类和工具类中通常会有大量的静态成员。
+实例变量属于某个对象的属性，必须创建了实例对象，其中的实例变量才会被分配空间，才能使用这个实例变量。
+
 39、什么是Java序列化，如何实现java序列化。
+概念：
+	序列化：把Java对象转换为字节序列的过程。
+	反序列化：把字节序列恢复为Java对象的过程。
+用途：
+	把对象的字节序列永久地保存到硬盘上，通常存放在一个文件中；在网络上传送对象的字节序列。
+序列化的实现：将需要被序列化的类实现Serializable接口，该接口没有需要实现的方法，implements Serializable只是为了标注该对象是可被序列化的，然后使用一个输出流
+(如：FileOutputStream)来构造一个ObjectOutputStream(对象流)对象，接着，使用ObjectOutputStream对象的writeObject(Object obj)方法就可以将参数为obj的对象写出
+(即保存其状态)，要恢复的话则用输入流。
 
 41、写clone方法，通常都有一行代码。
+super.clone()
+
+object clone方法源码如下
+protected Object clone() throws CloneNotSupportedException {
+    if (!(this instanceof Cloneable)) {
+        throw new CloneNotSupportedException("Class doesn't implement Cloneable");
+    }
+
+    return internalClone((Cloneable) this);
+}
+
+由源码可知如果要重写clone方法必定要实现Cloneable从而引用父类的方法super.clone();
+class Person implements Cloneable{
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+}
+
 42、Java中如何跳出多重嵌套循环
 43、说出常用类、包、接口，各举5个。
 44、Java中实现线程的方法，用关键字修饰同步方法。
@@ -76,13 +150,13 @@ byte、short、int 或者 char。从 Java SE 7 开始，switch 支持字符串 S
 8、Webservice介绍。（这个我自己没用过，渣渣了）
 9、说出Servlet生命周期，Servlet和CGI区别。
 10、sleep和wait的区别。
-11、什么是发射，如何实现。
+11、什么是反射，如何实现。
 12、检查字符串回文，实现英文中单词个数和单词次数统计（部分公司要求较高，需要手动编程，百度查找一些面试常用编程题即可）。
 13、tcp/ip协议三次握手。
 14、http协议几种请求方式，区别。
 15、Ajax请求是否可以实现同步。
 16、隐藏URL方式。
-17、描述取到一个网页内容的实现步骤，不需要具体实现过程（就是爬虫:取到网页的URL，然后从URL中国获取网页内容），考察逻辑思维能力。
+17、描述取到一个网页内容的实现步骤，不需要具体实现过程（就是爬虫:取到网页的URL，然后从URL中获取网页内容），考察逻辑思维能力。
 18、简述form表单提交post方法与get方法在字符编码、http协议方面的区别。
 19、一个http请求从开始到结束都经历了哪些过程，简写流程图。
 三、框架（只介绍自己熟悉）
